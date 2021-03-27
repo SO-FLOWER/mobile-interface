@@ -1,0 +1,171 @@
+import React from 'react'
+import '../css/index.css'
+import jsonData from '../feiyan.json'
+
+console.log(jsonData);
+
+let procincesObj = {}
+jsonData.data.list.forEach((item,index) => {
+    if(procincesObj[item.province] === undefined){
+        procincesObj[item.province] = {
+            confrim: 0,
+            heal: 0,
+            dead: 0
+        }
+    }
+ 
+    item.confrim = item.confrim?item.confrim:0;
+    item.heal = item.heal?item.heal:0;
+    item.dead = item.dead?item.dead:0;
+
+    procincesObj[item.province] = {
+        confrim: procincesObj[item.province].confrim + item.confrim,
+        heal: procincesObj[item.province].heal + item.heal,
+        dead: procincesObj[item.province].dead + item.dead
+    }
+})
+
+// let provinceList = []
+// for(const key in procincesObj){
+//     procincesObj[key].province = key;
+//     provinceList.push(procincesObj[key])
+// }
+
+// console.log(procincesObj);
+// console.log(provinceList);
+
+// let provinceListSort = provinceList.sort((a,b) => {
+//     if(a.heal > b.heal){
+//         return 1
+//     }else{
+//         return -1
+//     }
+// })
+
+// console.log(provinceListSort);
+
+class MapCom extends React.Component{
+    constructor(props){
+        super(props)
+    }
+
+    render(){
+        return(
+            <div className="contentItem">
+                <div className="map">
+                    <h3>地图</h3>
+                    <div id="map"></div>
+                </div>
+            </div>
+        )
+    }
+    componentDidMount(){
+        function randomValue() {
+            return Math.round(Math.random()*1000);
+        }
+        var dataList=[
+            {name:"南海诸岛",value:0},
+            {name: '北京', value: randomValue()},
+            {name: '天津', value: randomValue()},
+            {name: '上海', value: randomValue()},
+            {name: '重庆', value: randomValue()},
+            {name: '河北', value: randomValue()},
+            {name: '河南', value: randomValue()},
+            {name: '云南', value: randomValue()},
+            {name: '辽宁', value: randomValue()},
+            {name: '黑龙江', value: randomValue()},
+            {name: '湖南', value: randomValue()},
+            {name: '安徽', value: randomValue()},
+            {name: '山东', value: randomValue()},
+            {name: '新疆', value: randomValue()},
+            {name: '江苏', value: randomValue()},
+            {name: '浙江', value: randomValue()},
+            {name: '江西', value: randomValue()},
+            {name: '湖北', value: randomValue()},
+            {name: '广西', value: randomValue()},
+            {name: '甘肃', value: randomValue()},
+            {name: '山西', value: randomValue()},
+            {name: '内蒙古', value: randomValue()},
+            {name: '陕西', value: randomValue()},
+            {name: '吉林', value: randomValue()},
+            {name: '福建', value: randomValue()},
+            {name: '贵州', value: randomValue()},
+            {name: '广东', value: randomValue()},
+            {name: '青海', value: randomValue()},
+            {name: '西藏', value: randomValue()},
+            {name: '四川', value: randomValue()},
+            {name: '宁夏', value: randomValue()},
+            {name: '海南', value: randomValue()},
+            {name: '台湾', value: randomValue()},
+            {name: '香港', value: randomValue()},
+            {name: '澳门', value: randomValue()}
+        ]
+       dataList = dataList.map((item,index) => {
+            if(procincesObj[item.name]){
+                item.value = procincesObj[item.name].confirm
+            }else{
+                item.value = 0;
+            }
+            return item
+        })
+        var myChart = window.echarts.init(document.getElementById('map'));
+        
+        let option = {
+            tooltip: {
+                    formatter:function(params,ticket, callback){
+                        return params.seriesName+'<br />'+params.name+'：'+params.value
+                    }//数据格式化
+                },
+            visualMap: {
+                min: 0,
+                max: 1500,
+                left: 'left',
+                top: 'bottom',
+                text: ['高','低'],//取值范围的文字
+                inRange: {
+                    color: ['#F5DEB3', '#800000']//取值范围的颜色
+                },
+                show:true//图注
+            },
+            geo: {
+                map: 'china',
+                roam: false,//不开启缩放和平移
+                zoom:1.23,//视角缩放比例
+                label: {
+                    normal: {
+                        show: true,
+                        fontSize:'10',
+                        color: 'rgba(0,0,0,0.7)'
+                    }
+                },
+                itemStyle: {
+                    normal:{
+                        borderColor: 'rgba(0, 0, 0, 0.2)'
+                    },
+                    emphasis:{
+                        areaColor: '#F3B329',//鼠标选择区域颜色
+                        shadowOffsetX: 0,
+                        shadowOffsetY: 0,
+                        shadowBlur: 20,
+                        borderWidth: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            },
+            series : [
+                {
+                    name: '信息量',
+                    type: 'map',
+                    geoIndex: 0,
+                    data:dataList
+                }
+            ]
+        };
+
+        console.log(option)
+        console.log(myChart)
+        myChart.setOption(option);
+    }
+}
+
+export default MapCom
